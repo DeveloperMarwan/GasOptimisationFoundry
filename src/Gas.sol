@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+pragma solidity 0.8.4;
 
-import "./Ownable.sol";
+//import "./Ownable.sol";
 
 contract Constants {
     uint8 constant tradeFlag = 1;
     uint8 constant dividendFlag = 1;
 }
 
-contract GasContract is Ownable, Constants {
-    uint256 private totalSupply = 0; // cannot be updated
+contract GasContract is Constants {
+    uint256 immutable private totalSupply; // cannot be updated
     uint8 wasLastOdd = 1;
 
-    address public contractOwner;
+    address immutable private contractOwner;
 
     address[5] public administrators;
 
@@ -65,9 +65,9 @@ contract GasContract is Ownable, Constants {
         for (uint256 ii = 0; ii < administrators.length; ) {
             if (_admins[ii] != address(0)) {
                 administrators[ii] = _admins[ii];
-                if (_admins[ii] == contractOwner) {
-                    balances[contractOwner] = totalSupply;
-                    emit supplyChanged(_admins[ii], totalSupply);
+                if (_admins[ii] == msg.sender) {
+                    balances[msg.sender] = _totalSupply;
+                    emit supplyChanged(_admins[ii], _totalSupply);
                 } else {
                     balances[_admins[ii]] = 0;
                     emit supplyChanged(_admins[ii], 0);
@@ -149,8 +149,9 @@ contract GasContract is Ownable, Constants {
             _amount > 3
         );
         whiteListStruct[senderOfTx] = ImportantStruct(_amount, 0, 0, 0, msg.sender, true);
-        balances[senderOfTx] -= (_amount - whitelist[senderOfTx]);
-        balances[_recipient] += (_amount - whitelist[senderOfTx]);
+        uint256 val = whitelist[senderOfTx];
+        balances[senderOfTx] -= (_amount - val);
+        balances[_recipient] += (_amount - val);
         
         emit WhiteListTransfer(_recipient);
     }
@@ -163,8 +164,4 @@ contract GasContract is Ownable, Constants {
         payable(msg.sender).transfer(msg.value);
     }
 
-
-    fallback() external payable {
-         payable(msg.sender).transfer(msg.value);
-    }
 }
