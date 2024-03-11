@@ -10,7 +10,7 @@ contract Constants {
 
 contract GasContract is Constants {
     uint256 immutable private totalSupply; // cannot be updated
-    uint8 wasLastOdd = 1;
+    //uint8 wasLastOdd = 1;
 
     address immutable private contractOwner;
 
@@ -50,12 +50,14 @@ contract GasContract is Constants {
 
     event supplyChanged(address indexed, uint256 indexed);
     event Transfer(address recipient, uint256 amount);
+    /*
     event PaymentUpdated(
         address admin,
         uint256 ID,
         uint256 amount,
         string recipient
     );
+    */
     event WhiteListTransfer(address indexed);
 
     constructor(address[] memory _admins, uint256 _totalSupply) payable {
